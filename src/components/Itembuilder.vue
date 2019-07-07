@@ -1,34 +1,44 @@
 <template>
     <v-container>
         <div class="theme--dark">
-            <div v-for="category1 of itemCategories">
-                <v-layout text-xs-center wrap>
-                    <div v-for="category2 of itemCategories">
-                        <v-card dark :width=cardSize :height=cardSize
-                                @mouseenter="mouseEnter(category1,category2)"
-                                @mouseleave="mouseLeave(category1,category2)"
-                                @mousemove="onmousemove"
-                                :img="createUrl(category1,category2)">
-                        </v-card>
-                    </div>
-                </v-layout>
+            <v-layout text-xs-center>
+                <div v-for="category1 of itemCategories">
+                    <v-flex>
+                        <div v-for="category2 of itemCategories" class="item">
+                            <v-card dark :width=cardSize :height=cardSize
+                                    @mouseenter="mouseEnter(category1,category2)"
+                                    @mouseleave="mouseLeave(category1,category2)"
+                                    @mousemove="onmousemove"
+                                    :img="createUrl(category1,category2)">
+                            </v-card>
+                        </div>
+                    </v-flex>
+                </div>
+            </v-layout>
+        </div>
+        <v-layout>
+            <div id="tooltip" v-show="this.isShowToolTip" :style="style">
+                <v-card dark width="200px">
+                    <v-card-title>{{toolTipData.name}}</v-card-title>
+                    <v-flex lg12>
+                        <v-img :src="toolTipData.img" class="fill-height repeating-gradient"></v-img>
+                    </v-flex>
+                    <v-layout row lg12 v-show="toolTipData.isMixed">
+                        <v-flex lg6>
+                            <v-img :src="toolTipData.category1.img"></v-img>
+                        </v-flex>
+                        <v-flex lg6>
+                            <v-img :src="toolTipData.category2.img"></v-img>
+                        </v-flex>
+                    </v-layout>
+                </v-card>
             </div>
-        </div>
-        <div id="tooltip" v-show="this.isShowToolTip" :style="style">
-            <v-card dark width="200px" height="200px" >
-                <v-card-title>{{toolTipData.name}}</v-card-title>
-                <v-img :src="toolTipData.img" class="fill-height repeating-gradient" ></v-img>
-                <v-layout row v-show="toolTipData.isMixed" >
-                        <v-img  :src="toolTipData.category1.img"></v-img>
-                        <v-img  :src="toolTipData.category2.img"></v-img>
-                </v-layout>
-            </v-card>
-        </div>
+        </v-layout>
     </v-container>
 </template>
 
 <script>
-    const  itemData = require('../Data/ItemData.js')
+    const itemData = require('../Data/ItemData.js')
     export default {
         data: () => ({
             cardSize: '70px',
@@ -56,8 +66,21 @@
         created() {
             this.allItem = itemData.getAllItem()
             this.itemCategories = this.getItemCategories()
+            this.toolTipData = this.initToolTipData()
         },
         methods: {
+            initToolTipData() {
+                return {
+                    name: '',
+                    img: '',
+                    category1: {
+                        img: '',
+                    },
+                    category2: {
+                        img: '',
+                    }
+                }
+            },
             mouseEnter(c1, c2) {
                 this.isShowToolTip = true
                 this.toolTipData = {
@@ -74,17 +97,7 @@
             },
             mouseLeave(c1, c2) {
                 this.isShowToolTip = false
-                this.toolTipData = {
-                    name: '',
-                    img: '',
-                    category1: {
-                        img: '',
-                    },
-                    category2: {
-                        img: '',
-                    },
-
-                }
+                this.toolTipData = this.initToolTipData()
             },
             createUrl(category1, category2) {
                 const version = '9.13.1'
@@ -115,5 +128,14 @@
     }
 
 </script>
-<style>
+<style scoped>
+    .item {
+        display: table;
+        padding: 0.5em 1em;
+        font-weight: bold;
+        border-collapse: collapse;
+        border: solid 1px #acacac;
+
+
+    }
 </style>
